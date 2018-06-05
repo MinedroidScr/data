@@ -15,8 +15,8 @@ function initPage() {
     linksBlock = document.getElementsByClassName("linksBlock")[0]; // block where links will be
     mainContent = document.getElementsByClassName("mainContent")[0]; // block where info and graph will be
 
-    formattedArray = createFormattedArrayFromSource(); //formattedArray array contains all elements w/o char splitting (word[info], word1[info], ...)
-    charsData = sortByChars(formattedArray); //split array by chars (array: [A: [id,id,id], B:[id,id,id], ....])
+    formattedArray = createFormattedArrayFromSource(); //formattedArray array contains all elements w/o char splitting // array: [[word, descr, refs], [word, descr, refs], ..]
+    charsData = sortByChars(formattedArray); //split array by chars (array: {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....})
 
     for (var char in charsData) {
         newButton(char); //create char button
@@ -36,7 +36,7 @@ function initPage() {
 
     linkHandler({
         id: currentWord
-    });
+    }); // toggle current word specified in data.js
 }
 
 function initGraph() { // called one time to create network object
@@ -198,15 +198,17 @@ function newButton(name, func, style) { //create button
     buttonsBlock.appendChild(btn);
 }
 
-function buttonHandler(b) { //fires when any of header buttons clicked
+function buttonHandler(b) { //called when any of header buttons clicked
     mainContent.style.display = "none";
     linksBlock.style.display = ""; //hide info and show links
     n_history = [];
 
-    var char = b.innerHTML; // first word char
+    var char = b.innerHTML; // current called char
     linksBlock.innerHTML = ""; // clear links area before inserting smth
-    for (var i in charsData[char]){
-        var id = charsData[char][i]; // charsData array: {A:[id,id,id..], B:[id,id,id..]..}
+
+    for (var i in charsData[char]) {
+        var id = charsData[char][i][0]; // charsData array:  {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
+        var word = charsData[char][i][1];
 
         var a = document.createElement("a");
         var b = document.createElement("br");
@@ -214,13 +216,13 @@ function buttonHandler(b) { //fires when any of header buttons clicked
             linkHandler(this);
         };
         a.id = id;
-        a.innerHTML = formattedArray[id][0];
+        a.innerHTML = word;
         linksBlock.appendChild(a);
         linksBlock.appendChild(b);
     }
 }
 
-function linkHandler(l) { //called when any of links clicked
+function linkHandler(l) { //called when any link clicked
     mainContent.style.display = "";
     linksBlock.style.display = bck.style.display = "none"; // hide links and back button, show info
     n_history.push(l.id);
@@ -244,12 +246,21 @@ function mainContentFill(id) { // show info about choosen value (show descr and 
 
 function sortByChars(arr) { //split array by first word char
     var new_arr = {};
-    for (var i in formattedArray) {
+    /*for (var i in formattedArray) {
         var firstChar = firstCharWoSpecials(formattedArray[i][0]);
         var elId = parseInt(i);
         if (typeof new_arr[firstChar] == "undefined") // array: [A: [id,id,id], B:[id,id,id], ....]
             new_arr[firstChar] = [elId]
         else new_arr[firstChar].push(elId);
+    }*/
+    for (var i in words) {
+        var firstChar = firstCharWoSpecials(words[i].word);
+        var elId = parseInt(words[i].id);
+        if (typeof new_arr[firstChar] == "undefined") // array: {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
+            new_arr[firstChar] = [
+                [elId, words[i].word]
+            ]
+        else new_arr[firstChar].push([elId, words[i].word]);
     }
     return new_arr;
 }
@@ -259,6 +270,16 @@ function createFormattedArrayFromSource() {
     for (var i in nodes) {
         farr[nodes[i].id] = [nodes[i].label, nodes[i].comment, getAllReferences(nodes[i].id)];
     }
+    /*for (var i in words) {
+        for (var ii in words) {
+            if ((words[i].id == words[ii].id) && !(i == ii)) {
+                var id = words[i].id;
+                farr[id] = [
+                    [words[i].word, words[ii].word], farr[id][1], farr[id][2]
+                ];
+            }
+        }
+    }*/
     return farr;
 }
 
