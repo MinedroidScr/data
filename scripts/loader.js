@@ -6,7 +6,7 @@ var linksBlock;
 var mainContent;
 var n_history = [];
 
-var nodes_arr = new vis.DataSet(); // array for nodes. using to update them dynamically
+var nodes_arr = new vis.DataSet(); // array for nodes. used to update them dynamically
 var edges_arr = new vis.DataSet(); // same for references
 
 function initPage() {
@@ -105,7 +105,7 @@ function drawGraphForId(id) {
             label: formattedArray[ref][0]
         });
     });
-    //nodes_arr = new vis.DataSet(); //this using to update nodes dynamically (add 4 dots for borders)
+
     nodes_arr.clear();
     edges_arr.clear();
     nodes_arr.update(nodes_);
@@ -142,8 +142,8 @@ function alignNodes() {
     // now i dont envy u, i cant normally explain what happens there ->
 
     for (var i in nodes) {
-        if (!nodes[i].options.mainNode) {
-            if (n * (summh / c) >= summh / 2) {
+        if (!nodes[i].options.mainNode) { // dont touch main node
+            if (n * (summh / c) >= summh / 2) { // if nodes filled one half -> x = -x, n=0
                 x_ = -x_;
                 n = 0;
             }
@@ -205,7 +205,9 @@ function buttonHandler(b) { //fires when any of header buttons clicked
 
     var char = b.innerHTML; // first word char
     linksBlock.innerHTML = ""; // clear links area before inserting smth
-    [].forEach.call(charsData[char], function (id) {
+    for (var i in charsData[char]){
+        var id = charsData[char][i]; // charsData array: {A:[id,id,id..], B:[id,id,id..]..}
+
         var a = document.createElement("a");
         var b = document.createElement("br");
         a.onclick = function () {
@@ -215,20 +217,20 @@ function buttonHandler(b) { //fires when any of header buttons clicked
         a.innerHTML = formattedArray[id][0];
         linksBlock.appendChild(a);
         linksBlock.appendChild(b);
-    });
+    }
 }
 
-function linkHandler(l) { //fires when any of links clicked
+function linkHandler(l) { //called when any of links clicked
     mainContent.style.display = "";
     linksBlock.style.display = bck.style.display = "none"; // hide links and back button, show info
     n_history.push(l.id);
     mainContentFill(l.id);
 }
 
-function nodeHandler(id) { //fires wher any of nodes clicked
+function nodeHandler(id) { //called when any of nodes clicked
     if (typeof id == "number") { //to prevent adding fit nodes to history
         n_history.push(id); // add clicked node to history array
-        bck.style.display = (n_history.length == 1 ? "none" : ""); // hide history button if this first clicked node
+        bck.style.display = (n_history.length == 1 ? "none" : ""); // hide history button if this is first clicked node 
         mainContentFill(id); // prepare graph to init
     }
 }
