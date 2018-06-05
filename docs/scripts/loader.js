@@ -10,7 +10,7 @@ var nodes_arr = new vis.DataSet(); // array for nodes. used to update them dynam
 var edges_arr = new vis.DataSet(); // same for references
 
 function initPage() {
-    initGraph();
+    initGraph(); 
     buttonsBlock = document.getElementsByClassName("buttonsBlock")[0]; // block where buttons will be
     linksBlock = document.getElementsByClassName("linksBlock")[0]; // block where links will be
     mainContent = document.getElementsByClassName("mainContent")[0]; // block where info and graph will be
