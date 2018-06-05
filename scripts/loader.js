@@ -39,7 +39,7 @@ function initPage() {
     });
 }
 
-function initGraph() { // fires at one time to create network object
+function initGraph() { // called one time to create network object
     nodes_arr.add({}); //init dataset
     edges_arr.add({}); //init dataset
 
@@ -71,7 +71,10 @@ function initGraph() { // fires at one time to create network object
     network = new vis.Network(container, data, options);
 
     network.on("click", function (params) {
-        ((typeof this.getNodeAt(params.pointer.DOM) == "undefined") || (network.body.data.nodes._data[this.getNodeAt(params.pointer.DOM)].mainNode)) ? "" : nodeHandler(this.getNodeAt(params.pointer.DOM))
+        (
+            (typeof this.getNodeAt(params.pointer.DOM) == "undefined") ||
+            (network.body.data.nodes._data[this.getNodeAt(params.pointer.DOM)].mainNode)
+        ) ? "" : nodeHandler(this.getNodeAt(params.pointer.DOM))
     }); // handle graph element click
 }
 
@@ -240,7 +243,7 @@ function mainContentFill(id) { // show info about choosen value (show descr and 
 function sortByChars(arr) { //split array by first word char
     var new_arr = {};
     for (var i in formattedArray) {
-        var firstChar = FirstCharWoSpecials(formattedArray[i][0]);
+        var firstChar = firstCharWoSpecials(formattedArray[i][0]);
         var elId = parseInt(i);
         if (typeof new_arr[firstChar] == "undefined") // array: [A: [id,id,id], B:[id,id,id], ....]
             new_arr[firstChar] = [elId]
@@ -252,12 +255,12 @@ function sortByChars(arr) { //split array by first word char
 function createFormattedArrayFromSource() {
     var farr = {};
     for (var i in nodes) {
-        farr[nodes[i].id] = [nodes[i].label, nodes[i].comment, new_getAllReferences(nodes[i].id)];
+        farr[nodes[i].id] = [nodes[i].label, nodes[i].comment, getAllReferences(nodes[i].id)];
     }
     return farr;
 }
 
-function new_getAllReferences(id) {
+function getAllReferences(id) {
     var refs = [];
     for (var i in edges) {
         if (edges[i].to == id)
@@ -268,10 +271,9 @@ function new_getAllReferences(id) {
     return refs;
 }
 
-function FirstCharWoSpecials(txt) { // get first char of word
-    var i = 0;
-    while ((txt[i].toLowerCase() == txt[i].toUpperCase()) && //cos special chars havent upper\lower case and will be equal
-        (i < txt.length - 1))
-        i++;
-    return txt[i].toUpperCase();
+function firstCharWoSpecials(txt) { // get first char of word
+    for (var i in txt) {
+        if (!(txt[i].toLowerCase() == txt[i].toUpperCase() && (i < txt.length - 1)))
+            return txt[i].toUpperCase();
+    }
 }
