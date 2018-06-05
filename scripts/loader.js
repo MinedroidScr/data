@@ -1,0 +1,277 @@
+document.title = dicName;
+
+var network; // block w/ graph
+var buttonsBlock;
+var linksBlock;
+var mainContent;
+var n_history = [];
+
+var nodes_arr = new vis.DataSet(); // array for nodes. using to update them dynamically
+var edges_arr = new vis.DataSet(); // same for references
+
+function initPage() {
+    initGraph();
+    buttonsBlock = document.getElementsByClassName("buttonsBlock")[0]; // block where buttons will be
+    linksBlock = document.getElementsByClassName("linksBlock")[0]; // block where links will be
+    mainContent = document.getElementsByClassName("mainContent")[0]; // block where info and graph will be
+
+    formattedArray = createFormattedArrayFromSource(); //formattedArray array contains all elements w/o char splitting (word[info], word1[info], ...)
+    charsData = sortByChars(formattedArray); //split array by chars (array: [A: [id,id,id], B:[id,id,id], ....])
+
+    for (var char in charsData) {
+        newButton(char); //create char button
+    }
+
+    /*newButton("EN", function () { // language here
+        alert('it must change language')
+    }, "float:right; margin:5px;");*/
+
+    bck.onclick = function () { // back button event
+        mainContentFill(n_history[n_history.length - 2]);
+        n_history.splice(n_history.length - 1, 1);
+        n_history = n_history;
+        if (n_history.length == 1)
+            this.style.display = "none";
+    }
+
+    linkHandler({
+        id: currentWord
+    });
+}
+
+function initGraph() { // fires at one time to create network object
+    nodes_arr.add({}); //init dataset
+    edges_arr.add({}); //init dataset
+
+    var container = document.getElementById('graphhost'); // div where graph will be
+    var data = {
+        nodes: nodes_arr, // elements of graph
+        edges: edges_arr // references
+    };
+    var options = {
+        edges: {
+            font: {
+                size: 12
+            },
+            smooth: false /* IMPORTANT */
+        },
+        nodes: {
+            shape: 'box',
+            margin: 10,
+        },
+        physics: {
+            enabled: false
+        },
+        interaction: {
+            hover: true,
+            dragNodes: false
+        }
+    };
+
+    network = new vis.Network(container, data, options);
+
+    network.on("click", function (params) {
+        ((typeof this.getNodeAt(params.pointer.DOM) == "undefined") || (network.body.data.nodes._data[this.getNodeAt(params.pointer.DOM)].mainNode)) ? "" : nodeHandler(this.getNodeAt(params.pointer.DOM))
+    }); // handle graph element click
+}
+
+
+function drawGraphForId(id) {
+    var nodes_ = [];
+    var edges_ = [];
+
+    nodes_.push({ //insert main node
+        chosen: false,
+        mainNode: true,
+        color: "#D2E5FF",
+        border: "#2B7CE9",
+        id: id,
+        x: 0,
+        y: 0,
+        label: formattedArray[id][0]
+    });
+    [].forEach.call(formattedArray[id][2], function (ref) {
+        edges_.push({ //connect  main node to others
+            from: id,
+            to: ref
+        });
+        nodes_.push({ //insert linked nodes
+            chosen: false,
+            mainNode: false,
+            id: ref,
+            label: formattedArray[ref][0]
+        });
+    });
+    //nodes_arr = new vis.DataSet(); //this using to update nodes dynamically (add 4 dots for borders)
+    nodes_arr.clear();
+    edges_arr.clear();
+    nodes_arr.update(nodes_);
+    edges_arr.update(edges_);
+
+    alignNodes();
+}
+
+function alignNodes() {
+    var margin_h = 5; // margin btw blocks in height ** SETTING **
+    var margin_w = 5; // margin btw blocks in width ** SETTING **
+
+    var mw = 0; // max width
+    var summh = 0; // all height/2
+    var c = 0; // nodes count w/o main block
+    var x_ = 0; // main node width/2 + 2*margin_w
+    var nodes = network.nodesHandler.body.nodes; // all nodes array
+    for (var i in nodes) { // all nodes cycle
+        // find all blocks height/2 (w/o main)
+        if (!nodes[i].options.mainNode) {
+            summh += nodes[i].shape.height / 2 + margin_h;
+            c++;
+            // find max block width//
+            if (mw < nodes[i].shape.width)
+                mw = nodes[i].shape.width;
+        } else {
+            x_ = nodes[i].shape.width / 2 + margin_w * 2; //main node width/2+margin
+        }
+    }
+
+    var y_ = summh / 2; // max y coordinate
+    var n = 0; // nodes count
+
+    // now i dont envy u, i cant normally explain what happens there ->
+
+    for (var i in nodes) {
+        if (!nodes[i].options.mainNode) {
+            if (n * (summh / c) >= summh / 2) {
+                x_ = -x_;
+                n = 0;
+            }
+            network.moveNode(i, -x_ + -(x_ / Math.abs(x_)) * (nodes[i].shape.width / 2), // x:1, y:1 is IV quarter on cricle
+                -y_ + n * (summh * 2 / c) // *n* positions up\down
+            );
+            n++;
+        }
+    }
+
+    // add 4 invisible nodes to mark borders
+    nodes_arr.update([{
+        id: "fit1",
+        x: 0 - mw - margin_w - Math.abs((x_ - margin_w * 2)),
+        y: summh / 2,
+        shape: "text" // shape:text using to hide node, little h4x
+    }]); // nodes hidden:true wont change view when using fit()
+    nodes_arr.update([{
+        id: "fit3",
+        x: 0 - mw - margin_w - Math.abs((x_ - margin_w * 2)),
+        y: -summh / 2,
+        shape: "text"
+    }]);
+    nodes_arr.update([{
+        id: "fit2",
+        x: 0 + mw + margin_w + Math.abs((x_ - margin_w * 2)),
+        y: -summh / 2,
+        shape: "text"
+    }]);
+    nodes_arr.update([{
+        id: "fit4",
+        x: 0 + mw + margin_w + Math.abs((x_ - margin_w * 2)),
+        y: summh / 2,
+        shape: "text"
+    }]);
+
+    network.fit(); // fit zoom depending on nodes
+}
+
+function newButton(name, func, style) { //create button
+    var btn = document.createElement("button");
+    btn.className = "headBtn";
+    btn.innerHTML = name;
+    if (!func)
+        btn.onclick = function () {
+            buttonHandler(this)
+        }
+    else // create custom event if specified
+        btn.onclick = func;
+    if (style) // set style if specified
+        btn.style.cssText = style;
+    buttonsBlock.appendChild(btn);
+}
+
+function buttonHandler(b) { //fires when any of header buttons clicked
+    mainContent.style.display = "none";
+    linksBlock.style.display = ""; //hide info and show links
+    n_history = [];
+
+    var char = b.innerHTML; // first word char
+    linksBlock.innerHTML = ""; // clear links area before inserting smth
+    [].forEach.call(charsData[char], function (id) {
+        var a = document.createElement("a");
+        var b = document.createElement("br");
+        a.onclick = function () {
+            linkHandler(this);
+        };
+        a.id = id;
+        a.innerHTML = formattedArray[id][0];
+        linksBlock.appendChild(a);
+        linksBlock.appendChild(b);
+    });
+}
+
+function linkHandler(l) { //fires when any of links clicked
+    mainContent.style.display = "";
+    linksBlock.style.display = bck.style.display = "none"; // hide links and back button, show info
+    n_history.push(l.id);
+    mainContentFill(l.id);
+}
+
+function nodeHandler(id) { //fires wher any of nodes clicked
+    if (typeof id == "number") { //to prevent adding fit nodes to history
+        n_history.push(id); // add clicked node to history array
+        bck.style.display = (n_history.length == 1 ? "none" : ""); // hide history button if this first clicked node
+        mainContentFill(id); // prepare graph to init
+    }
+}
+
+function mainContentFill(id) { // show info about choosen value (show descr and graph)
+    drawGraphForId(id);
+    var curr = formattedArray[id]; // current element options
+    mainContent.childNodes[3].childNodes[1].innerHTML = "<h1>" + curr[0] + "</h1><br>" + curr[1];
+    //    ->                                                                      if there's no descr - it wont show
+}
+
+function sortByChars(arr) { //split array by first word char
+    var new_arr = {};
+    for (var i in formattedArray) {
+        var firstChar = FirstCharWoSpecials(formattedArray[i][0]);
+        var elId = parseInt(i);
+        if (typeof new_arr[firstChar] == "undefined") // array: [A: [id,id,id], B:[id,id,id], ....]
+            new_arr[firstChar] = [elId]
+        else new_arr[firstChar].push(elId);
+    }
+    return new_arr;
+}
+
+function createFormattedArrayFromSource() {
+    var farr = {};
+    for (var i in nodes) {
+        farr[nodes[i].id] = [nodes[i].label, nodes[i].comment, new_getAllReferences(nodes[i].id)];
+    }
+    return farr;
+}
+
+function new_getAllReferences(id) {
+    var refs = [];
+    for (var i in edges) {
+        if (edges[i].to == id)
+            refs.push(edges[i].from)
+        if (edges[i].from == id)
+            refs.push(edges[i].to)
+    }
+    return refs;
+}
+
+function FirstCharWoSpecials(txt) { // get first char of word
+    var i = 0;
+    while ((txt[i].toLowerCase() == txt[i].toUpperCase()) && //cos special chars havent upper\lower case and will be equal
+        (i < txt.length - 1))
+        i++;
+    return txt[i].toUpperCase();
+}

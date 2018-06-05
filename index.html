@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .mainBlock {
+            position: relative;
+            background-color: #FFCCCC;
+            width: 790px;
+            height: 590px;
+            border-radius: 3px;
+            margin: 5px;
+            margin-top: 13px;
+        }
+
+        .mainBlock>.buttonsBlock {
+            position: relative;
+            background-color: #FFDB8F;
+            height: 30px;
+            margin: 5px;
+            /* Этот css сумасшедший, иначе 5px сверху не добавить */
+            float: left;
+            width: 780px;
+            /* mainBlock.width-10px */
+            /* */
+        }
+
+        .mainBlock>.mainContentHost {
+            position: relative;
+            background-color: #E7B8B9;
+            height: 530px;
+            margin: 5px;
+            /* Этот css сумасшедший, иначе 5px сверху не добавить */
+            float: left;
+            width: 780px;
+            /* mainBlock.width-10px */
+            /* */
+        }
+
+        .mainContent {
+            background-color: #D2D9B3;
+            width: 100%;
+            height: 100%;
+
+        }
+
+        * {
+            outline: none;
+        }
+
+        .mainContent>.graphParent {
+            position: relative;
+            margin: 10px;
+            width: 760px;
+            height: 370px;
+            float: left;
+            border-style: solid;
+            border-width: 1px;
+            background-color: white;
+        }
+
+        .mainContent>.info {
+            position: relative;
+            margin: 10px;
+            width: 760px;
+            height: 105px;
+            float: left;
+            resize: none;
+            border-style: solid;
+            border-width: 1px;
+            outline: none;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .buttonsBlock>.headBtn {
+            margin-top: 5px;
+            margin-left: 5px;
+            border: 1px solid #5C6367;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+            color: black;
+            cursor: pointer;
+            background-image: linear-gradient(to bottom, #FDF3DD, #ECD7AB);
+            padding-left: 5px;
+            width:20px;
+        }
+
+        .linksBlock>a {
+            color: blue;
+            cursor: pointer;
+            margin: 5px;
+            float: left;
+            position: absolute;
+        }
+
+        .text>h1 {
+            display: inline;
+            font-size: 20;
+        }
+
+        .info>.text {
+            padding-left: 5px;
+            padding-right: 5px;
+            margin: 0px;
+        }
+
+        .graphParent>#graphhost {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graphParent>.back {
+            right: 0;
+            z-index: 999;
+            position: absolute;
+            background-color: lightgray;
+            width: 40px;
+            height: 15px;
+            margin: 3px;
+            border: 1px solid #5C6367;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+            color: black;
+            cursor: pointer;
+            font-size: 10px;
+            background-image: linear-gradient(to bottom, #FDF3DD, #ECD7AB);
+        }
+    </style>
+    <script src="data.js"></script>
+    <script type="text/javascript" src="scripts/vis.js"></script>
+    <script src="scripts/loader.js"></script>
+
+</head>
+
+<body onload=initPage()>
+    <div class=mainBlock>
+        <div class=buttonsBlock></div>
+        <div class=mainContentHost>
+            <div class="mainContent" style="display:none">
+                <div class=graphParent>
+                    <button class=back id=bck style="display:none">назад</button>
+                    <div id="graphhost"></div>
+                </div>
+                <div class=info>
+                    <p class="text"></p>
+                </div>
+            </div>
+            <div class=linksBlock></div>
+        </div>
+    </div>
+</body>
+
+</html>
