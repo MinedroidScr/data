@@ -1,4 +1,3 @@
-document.title = dicName;
 
 var network; // block w/ graph
 var buttonsBlock;
