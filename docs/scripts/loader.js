@@ -49,14 +49,16 @@ function initGraph() { // called one time to create network object
     };
     var options = {
         edges: {
-            font: {
-                size: 12
-            },
             smooth: false /* IMPORTANT */
         },
         nodes: {
             shape: 'box',
             margin: 10,
+            font: {
+                color: '#343434',
+                size: 14, // px
+                face: 'arial',
+            }
         },
         physics: {
             enabled: false
