@@ -42,7 +42,7 @@ function fitElements() {
     var graphParent = document.getElementsByClassName("graphParent")[0];
     var infoBlock = document.getElementsByClassName("info")[0];
     var margin = 10;
-    var infoHeight = 100;
+    var infoHeight = 150;
     graphParent.style.height = window.innerHeight - margin * 2 - infoHeight - 40 + "px";
     graphParent.style.margin = margin + "px";
     infoBlock.style.height = infoHeight - 2 * margin + "px";
@@ -218,7 +218,7 @@ function buttonHandler(b) { //called when any of header buttons clicked
     n_history = [];
 
     var char = b.innerHTML; // current called char
-    linksBlock.innerHTML = ""; // clear links area before inserting smth
+    linksBlock.innerHTML = "<div id=\"spacing\"></div>"; // clear links area before inserting smth
 
     for (var i in charsData[char]) {
         var id = charsData[char][i][0]; // charsData array:  {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
