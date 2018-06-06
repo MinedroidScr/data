@@ -2,26 +2,34 @@
 <html>
 
 <head>
-    <title></title>
+    <title>Словарь по дисциплине Рынок ценных бумаг</title>
+    <!--HTML5: Element title must not be empty-->
     <style>
+        * {
+            outline: none;
+            font-family: Arial;
+        }
+
+        body {
+            margin: 0;
+        }
+
+
         .mainBlock {
-            position: relative;
+            position: absolute;
             background-color: #FFCCCC;
-            width: 790px;
-            height: 590px;
-            border-radius: 3px;
-            margin: 5px;
-            margin-top: 13px;
+            width: 100%;
+            height: 100%;
         }
 
         .mainBlock>.buttonsBlock {
-            position: relative;
+            position: absolute;
             background-color: #FFDB8F;
-            height: 30px;
-            margin: 5px;
+            height: 40px;
+            z-index: 123;
             /* Этот css сумасшедший, иначе 5px сверху не добавить */
             float: left;
-            width: 780px;
+            width: 100%;
             /* mainBlock.width-10px */
             /* */
         }
@@ -29,11 +37,11 @@
         .mainBlock>.mainContentHost {
             position: relative;
             background-color: #E7B8B9;
-            height: 530px;
-            margin: 5px;
+            height: 100%;
+            /*margin: 5px;*/
             /* Этот css сумасшедший, иначе 5px сверху не добавить */
-            float: left;
-            width: 780px;
+            /*float: left;*/
+            width: 100%;
             /* mainBlock.width-10px */
             /* */
         }
@@ -42,18 +50,16 @@
             background-color: #D2D9B3;
             width: 100%;
             height: 100%;
-
-        }
-
-        * {
-            outline: none;
+            display: flex;
+            flex-direction: column;
         }
 
         .mainContent>.graphParent {
             position: relative;
-            margin: 10px;
-            width: 760px;
-            height: 370px;
+            /*margin: 10px;*/
+            /*margin-top:50px;*/
+            /*width: 100%;*/
+            /*height: 70%;*/
             float: left;
             border-style: solid;
             border-width: 1px;
@@ -62,9 +68,9 @@
 
         .mainContent>.info {
             position: relative;
-            margin: 10px;
-            width: 760px;
-            height: 105px;
+            /*margin: 10px;*/
+            /*width: 100%;*/
+            /*height: 200px;*/
             float: left;
             resize: none;
             border-style: solid;
@@ -80,12 +86,19 @@
             border: 1px solid #5C6367;
             border-radius: 3px;
             text-decoration: none;
-            display: inline-block;
             color: black;
             cursor: pointer;
             background-image: linear-gradient(to bottom, #FDF3DD, #ECD7AB);
-            padding-left: 5px;
-            width:20px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .linksBlock {
+            width: 100%;
+            height: 100%;
         }
 
         .linksBlock>a {
@@ -131,27 +144,34 @@
         }
     </style>
     <script src="data.js"></script>
+    <script>
+        document.title = dicName;
+    </script>
     <script type="text/javascript" src="scripts/vis.js"></script>
     <script src="scripts/loader.js"></script>
 
 </head>
 
-<body onload=initPage()>
-    <div class=mainBlock>
-        <div class=buttonsBlock></div>
-        <div class=mainContentHost>
-            <div class="mainContent" style="display:none">
-                <div class=graphParent>
-                    <button class=back id=bck style="display:none">назад</button>
+<body onload="initPage()" onresize="fitElements()">
+    <div class="mainBlock">
+        <div class="buttonsBlock">
+        </div>
+        <div class="mainContentHost">
+            <div class="mainContent">
+                <div id="spacing" style="height:40px;"></div>
+                <div class="graphParent">
+                    <button class="back" id="bck">назад</button>
                     <div id="graphhost"></div>
                 </div>
-                <div class=info>
+                <div class="info" style="height: 80px;">
                     <p class="text"></p>
                 </div>
             </div>
-            <div class=linksBlock></div>
+            <div class="linksBlock" style="display: none;"></div>
         </div>
     </div>
+
+
 </body>
 
 </html>

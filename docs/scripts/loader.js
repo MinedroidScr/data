@@ -1,5 +1,3 @@
-document.title = dicName;
-
 var network; // block w/ graph
 var buttonsBlock;
 var linksBlock;
@@ -10,13 +8,14 @@ var nodes_arr = new vis.DataSet(); // array for nodes. used to update them dynam
 var edges_arr = new vis.DataSet(); // same for references
 
 function initPage() {
+    fitElements();
     initGraph();
     buttonsBlock = document.getElementsByClassName("buttonsBlock")[0]; // block where buttons will be
     linksBlock = document.getElementsByClassName("linksBlock")[0]; // block where links will be
     mainContent = document.getElementsByClassName("mainContent")[0]; // block where info and graph will be
 
     formattedArray = createFormattedArrayFromSource(); //formattedArray array contains all elements w/o char splitting // array: [[word, descr, refs], [word, descr, refs], ..]
-    charsData = sortByChars(formattedArray); //split array by chars (array: [A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....])
+    charsData = sortByChars(formattedArray); //split array by chars (array: {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....})
 
     for (var char in charsData) {
         newButton(char); //create char button
@@ -39,6 +38,19 @@ function initPage() {
     }); // toggle current word specified in data.js
 }
 
+function fitElements() {
+    var graphParent = document.getElementsByClassName("graphParent")[0];
+    var infoBlock = document.getElementsByClassName("info")[0];
+    var margin = 10;
+    var infoHeight = 100;
+    graphParent.style.height = window.innerHeight - margin * 2 - infoHeight - 40 + "px";
+    graphParent.style.margin = margin + "px";
+    infoBlock.style.height = infoHeight - 2 * margin + "px";
+    infoBlock.style.margin = margin + "px";
+    //(typeof(network)=="undefined")?false:network.fit();
+}
+
+
 function initGraph() { // called one time to create network object
     nodes_arr.add({}); //init dataset
     edges_arr.add({}); //init dataset
@@ -50,14 +62,16 @@ function initGraph() { // called one time to create network object
     };
     var options = {
         edges: {
-            font: {
-                size: 12
-            },
             smooth: false /* IMPORTANT */
         },
         nodes: {
             shape: 'box',
             margin: 10,
+            font: {
+                color: '#343434',
+                size: 14, // px
+                face: 'arial',
+            }
         },
         physics: {
             enabled: false
@@ -207,7 +221,7 @@ function buttonHandler(b) { //called when any of header buttons clicked
     linksBlock.innerHTML = ""; // clear links area before inserting smth
 
     for (var i in charsData[char]) {
-        var id = charsData[char][i][0]; // charsData array: {A:[id,id,id..], B:[id,id,id..]..}
+        var id = charsData[char][i][0]; // charsData array:  {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
         var word = charsData[char][i][1];
 
         var a = document.createElement("a");
@@ -240,7 +254,7 @@ function nodeHandler(id) { //called when any of nodes clicked
 function mainContentFill(id) { // show info about choosen value (show descr and graph)
     drawGraphForId(id);
     var curr = formattedArray[id]; // current element options
-    mainContent.childNodes[3].childNodes[1].innerHTML = "<h1>" + curr[0] + "</h1><br>" + curr[1];
+    document.getElementsByClassName("text")[0].innerHTML = "<h1>" + curr[0] + "</h1><br>" + curr[1];
     //    ->                                                                      if there's no descr - it wont show
 }
 
@@ -256,7 +270,7 @@ function sortByChars(arr) { //split array by first word char
     for (var i in words) {
         var firstChar = firstCharWoSpecials(words[i].word);
         var elId = parseInt(words[i].id);
-        if (typeof new_arr[firstChar] == "undefined") // array: [A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....]
+        if (typeof new_arr[firstChar] == "undefined") // array: {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
             new_arr[firstChar] = [
                 [elId, words[i].word]
             ]
