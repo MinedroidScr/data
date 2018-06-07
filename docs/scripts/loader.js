@@ -12,6 +12,7 @@ function initPage() {
     initGraph();
     buttonsBlock = document.getElementsByClassName("buttonsBlock")[0]; // block where buttons will be
     linksBlock = document.getElementsByClassName("linksBlock")[0]; // block where links will be
+    linksHost = document.getElementsByClassName("linksHost")[0]; // block where links will be
     mainContent = document.getElementsByClassName("mainContent")[0]; // block where info and graph will be
 
     formattedArray = createFormattedArrayFromSource(); //formattedArray array contains all elements w/o char splitting // array: [[word, descr, refs], [word, descr, refs], ..]
@@ -69,7 +70,7 @@ function initGraph() { // called one time to create network object
             margin: 10,
             font: {
                 color: '#343434',
-                size: 14, // px
+                size: 24, // px
                 face: 'arial',
             }
         },
@@ -91,7 +92,6 @@ function initGraph() { // called one time to create network object
         ) ? "" : nodeHandler(this.getNodeAt(params.pointer.DOM))
     }); // handle graph element click
 }
-
 
 function drawGraphForId(id) {
     var nodes_ = [];
@@ -218,12 +218,16 @@ function buttonHandler(b) { //called when any of header buttons clicked
     n_history = [];
 
     var char = b.innerHTML; // current called char
-    linksBlock.innerHTML = "<div id=\"spacing\"></div>"; // clear links area before inserting smth
-
+    linksHost.innerHTML = ""; // clear links area before inserting smth
+    var tb = document.createElement("table");
+    linksHost.appendChild(tb);
+    var curr_height = 0;
+    var link_height = 20;
+    var link_margin = 5;
+    tb.appendChild(ctd());
     for (var i in charsData[char]) {
         var id = charsData[char][i][0]; // charsData array:  {A: [[id, word],[id, word],..], B:[[id, word],[id, word],..], ....}
         var word = charsData[char][i][1];
-
         var a = document.createElement("a");
         var b = document.createElement("br");
         a.onclick = function () {
@@ -231,10 +235,23 @@ function buttonHandler(b) { //called when any of header buttons clicked
         };
         a.id = id;
         a.innerHTML = word;
-        linksBlock.appendChild(a);
-        linksBlock.appendChild(b);
+
+        curr_height += link_height + link_margin * 2;
+
+        if (curr_height - 40 > window.innerHeight) {
+            tb.appendChild(ctd());
+            curr_height = 0;
+        }
+
+        tb.childNodes[tb.childNodes.length - 1].appendChild(a);
+        tb.childNodes[tb.childNodes.length - 1].appendChild(b);
     }
 }
+
+function ctd() {
+    return document.createElement("td");
+}
+
 
 function linkHandler(l) { //called when any link clicked
     mainContent.style.display = "";
@@ -260,13 +277,6 @@ function mainContentFill(id) { // show info about choosen value (show descr and 
 
 function sortByChars(arr) { //split array by first word char
     var new_arr = {};
-    /*for (var i in formattedArray) {
-        var firstChar = firstCharWoSpecials(formattedArray[i][0]);
-        var elId = parseInt(i);
-        if (typeof new_arr[firstChar] == "undefined") // array: [A: [id,id,id], B:[id,id,id], ....]
-            new_arr[firstChar] = [elId]
-        else new_arr[firstChar].push(elId);
-    }*/
     for (var i in words) {
         var firstChar = firstCharWoSpecials(words[i].word);
         var elId = parseInt(words[i].id);
@@ -284,16 +294,6 @@ function createFormattedArrayFromSource() {
     for (var i in nodes) {
         farr[nodes[i].id] = [nodes[i].label, nodes[i].comment, getAllReferences(nodes[i].id)];
     }
-    /*for (var i in words) {
-        for (var ii in words) {
-            if ((words[i].id == words[ii].id) && !(i == ii)) {
-                var id = words[i].id;
-                farr[id] = [
-                    [words[i].word, words[ii].word], farr[id][1], farr[id][2]
-                ];
-            }
-        }
-    }*/
     return farr;
 }
 
